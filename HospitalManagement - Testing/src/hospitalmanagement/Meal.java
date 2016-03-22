@@ -5,18 +5,20 @@ import java.sql.Time;
 
 public class Meal {
 
-    private int meal_id, patient_id;
+    private int meal_id;
     private String meal_name;
     private boolean eaten;
-    private Time meal_time;
+    private String meal_time;
 
-    public Meal(int meal_id, int patient_id, String meal_name, boolean eaten, Time meal_time) {
+    public Meal(int meal_id, String meal_name, boolean eaten, String meal_time) {
         this.meal_id = meal_id;
-        this.patient_id = patient_id;
+        //this.patient_id = patient_id;
         this.meal_name = meal_name;
         this.eaten = eaten;
         this.meal_time = meal_time;
     }
+    
+    public Meal() {}
 
     public int getMeal_id() {
         return meal_id;
@@ -24,14 +26,6 @@ public class Meal {
 
     public void setMeal_id(int meal_id) {
         this.meal_id = meal_id;
-    }
-
-    public int getPatient_id() {
-        return patient_id;
-    }
-
-    public void setPatient_id(int patient_id) {
-        this.patient_id = patient_id;
     }
 
     public String getMeal_name() {
@@ -50,11 +44,11 @@ public class Meal {
         this.eaten = eaten;
     }
 
-    public Time getMeal_time() {
+    public String getMeal_time() {
         return meal_time;
     }
 
-    public void setMeal_time(Time meal_time) {
+    public void setMeal_time(String meal_time) {
         this.meal_time = meal_time;
     }
 

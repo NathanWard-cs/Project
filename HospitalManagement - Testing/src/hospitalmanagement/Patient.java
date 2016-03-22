@@ -5,40 +5,67 @@
  */
 package hospitalmanagement;
 
+import javafx.collections.ObservableList;
+
 public class Patient {
     
-    private int time_waiting;
+    private int id, time_waiting;
     private String forename, surname, symptoms, illness;
     private boolean in_queue;
-    private Doctor doctor;
-    private Prescription presc;
+    private ObservableList<Prescription> presc;
+    private ObservableList<Meal> meals;
     
     public Patient(String forename, String surname, String symptoms, 
-            String illness, boolean in_queue, int time_waiting, Doctor doctor, Prescription presc) {
+            String illness, boolean in_queue, int time_waiting, ObservableList<Prescription> presc,
+            ObservableList<Meal> meals) {
         this.forename = forename;
         this.surname = surname;
         this.symptoms = symptoms;
         this.illness = illness;
         this.in_queue = in_queue;
         this.time_waiting = time_waiting;
-        this.doctor = doctor;
         this.presc = presc;
+        this.meals = meals;
+    }
+    
+    public Patient(int id, String forename, String surname, String symptoms, 
+            String illness, boolean in_queue, int time_waiting, ObservableList<Prescription> presc,
+            ObservableList<Meal> meals) {
+        this.id = id;
+        this.forename = forename;
+        this.surname = surname;
+        this.symptoms = symptoms;
+        this.illness = illness;
+        this.in_queue = in_queue;
+        this.time_waiting = time_waiting;
+        this.presc = presc;
+        this.meals = meals;
+    }
+    
+    public Patient() {}
+
+    public int getId() {
+        return id;
     }
 
-    public Doctor getDoctor() {
-        return doctor;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public void setDoctor(Doctor doctor) {
-        this.doctor = doctor;
-    }
-
-    public Prescription getPresc() {
+    public ObservableList<Prescription> getPresc() {
         return presc;
     }
 
-    public void setPresc(Prescription presc) {
+    public void setPresc(ObservableList<Prescription> presc) {
         this.presc = presc;
+    }
+    
+    public ObservableList<Meal> getMeals() {
+        return meals;
+    }
+
+    public void setMeals(ObservableList<Meal> meals) {
+        this.meals = meals;
     }
 
     public int getTime_waiting() {
@@ -87,6 +114,12 @@ public class Patient {
 
     public void setSurname(String surname) {
         this.surname = surname;
+    }
+    
+    
+    
+    public String patientToString() {
+        return "Forename: "+forename+", Surname: "+surname+", Symptoms: "+symptoms+", Illness: "+illness+", In Queue: "+in_queue+", Time waiting: "+time_waiting;
     }
     
 }

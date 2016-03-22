@@ -1,16 +1,31 @@
 
 package hospitalmanagement;
 
+import javafx.collections.ObservableList;
+
 public class Doctor {
 
     private int doctor_id;
     private String doctor_forename, doctor_surname, specialisation;
+    private ObservableList<Patient> patients;
 
-    public Doctor(int doctor_id, String doctor_forename, String doctor_surname, String specialisation) {
+    public Doctor(int doctor_id, String doctor_forename, String doctor_surname, String specialisation, ObservableList<Patient> patients) {
         this.doctor_id = doctor_id;
         this.doctor_forename = doctor_forename;
         this.doctor_surname = doctor_surname;
         this.specialisation = specialisation;
+        this.patients = patients;
+    }
+    
+    public Doctor() {
+    }
+
+    public ObservableList<Patient> getPatients() {
+        return patients;
+    }
+
+    public void setPatients(ObservableList<Patient> patients) {
+        this.patients = patients;
     }
 
     public int getDoctor_id() {
@@ -45,5 +60,8 @@ public class Doctor {
         this.specialisation = specialisation;
     }
     
-    
+    public String doctorToString() {
+        return "Doctor Forename: "+doctor_forename+", Doctor Surname: "+doctor_surname+", Doctor Specialisation: "
+                + ""+specialisation;
+    }
 }

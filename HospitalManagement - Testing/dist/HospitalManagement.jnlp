@@ -11,7 +11,7 @@
   </resources>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="HospitalManagement.jar" size="18279" download="eager" />
+    <jar href="HospitalManagement.jar" size="40130" download="eager" />
     <jar href="lib/derbyclient.jar" size="584976" download="eager" />
     <jar href="lib/sqlite-jdbc-3.8.11.2.jar" size="5575351" download="eager" />
   </resources>
