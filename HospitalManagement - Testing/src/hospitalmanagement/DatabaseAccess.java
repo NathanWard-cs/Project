@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+/**
+ *
+ * @author nathan ward
+ */
 public class DatabaseAccess {
 
     private Connection connection = null;
@@ -19,6 +23,11 @@ public class DatabaseAccess {
     private ObservableList<Ward> wards;
     private ObservableList<Meal> meals;
 
+    /**
+     *
+     * @throws SQLException
+     * @throws ClassNotFoundException
+     */
     public DatabaseAccess() throws SQLException, ClassNotFoundException {
         try {
             Class.forName("org.sqlite.JDBC");
@@ -29,12 +38,23 @@ public class DatabaseAccess {
         }
     }
 
+    /**
+     *
+     * @throws SQLException
+     */
     public void shutdown() throws SQLException {
         if (connection != null) {
             connection.close();
         }
     }
 
+    /**
+     *
+     * @param username
+     * @param password
+     * @return
+     * @throws SQLException
+     */
     public boolean login(String username, String password) throws SQLException {
 
         if (connection != null) {
@@ -42,7 +62,6 @@ public class DatabaseAccess {
             ResultSet result = stmt.executeQuery("SELECT * FROM login");
             while (result.next()) {
                 if ((result.getString("username").equals(username)) && (result.getString("password").equals(password))) {
-                    System.out.println("Logged in");
                     return true;
                 }
 
@@ -51,6 +70,11 @@ public class DatabaseAccess {
         return false;
     }
 
+    /**
+     *
+     * @return
+     * @throws SQLException
+     */
     public ObservableList<Bed> getBeds() throws SQLException {
         int bedId, patientId;
         boolean bedCleaned;
@@ -79,6 +103,11 @@ public class DatabaseAccess {
         return beds;
     }
 
+    /**
+     *
+     * @return
+     * @throws SQLException
+     */
     public ObservableList<Meal> getMeals() throws SQLException {
         int id;
         String mealName, mealTime;
@@ -103,9 +132,14 @@ public class DatabaseAccess {
         }
     }
 
+    /**
+     *
+     * @return
+     * @throws SQLException
+     */
     public ObservableList<Patient> getPatients() throws SQLException {
-        int id, time_waiting, doctor_id;
-        String forename, surname, symptoms, illness;
+        int id;
+        String forename, surname, symptoms, illness, timeArrived;
         boolean in_queue;
         doctors = getDoctors();
         prescriptions = getPrescription();
@@ -123,9 +157,9 @@ public class DatabaseAccess {
                 symptoms = result.getString("symptoms");
                 illness = result.getString("illness");
                 in_queue = result.getBoolean("in_queue");
-                time_waiting = result.getInt("time_waiting_minutes");
+                timeArrived = result.getString("time_arrived");
 
-                patient = new Patient(id, forename, surname, symptoms, illness, in_queue, time_waiting, getPrescriptionsForPatient(id), getMealsForPatient(id));
+                patient = new Patient(id, forename, surname, symptoms, illness, in_queue, timeArrived, getPrescriptionsForPatient(id), getMealsForPatient(id));
                 //System.out.println(patient.getForename());
                 patients.add(patient);
             }
@@ -136,6 +170,11 @@ public class DatabaseAccess {
         }
     }
 
+    /**
+     *
+     * @return
+     * @throws SQLException
+     */
     public ObservableList<Doctor> getDoctors() throws SQLException {
         int doctor_id;
         String doctor_forename, doctor_surname, specialisation;
@@ -161,6 +200,11 @@ public class DatabaseAccess {
         }
     }
 
+    /**
+     *
+     * @return
+     * @throws SQLException
+     */
     public ObservableList<Prescription> getPrescription() throws SQLException {
         int id, frequency, numberOfDays, patientId;
         String medication, timeToTakeMedicine;
@@ -188,6 +232,11 @@ public class DatabaseAccess {
         return prescriptions;
     }
 
+    /**
+     *
+     * @return
+     * @throws SQLException
+     */
     public ObservableList<Ward> getWard() throws SQLException {
         int wardId;
         String wardName;
@@ -209,6 +258,11 @@ public class DatabaseAccess {
         }
     }
     
+    /**
+     *
+     * @return
+     * @throws SQLException
+     */
     public ObservableList<Bed> getUnoccupiedBeds() throws SQLException {
         ObservableList<Bed> unoccupied = FXCollections.observableArrayList();
         ObservableList<Bed> allBeds = getBeds();
@@ -220,6 +274,11 @@ public class DatabaseAccess {
         return unoccupied;
     }
 
+    /**
+     *
+     * @param cleaned
+     * @param ward_id
+     */
     public void addBed(boolean cleaned, int ward_id) {
         try {
             Statement stmt = connection.createStatement();
@@ -229,6 +288,13 @@ public class DatabaseAccess {
         }
     }
 
+    /**
+     *
+     * @param forename
+     * @param surname
+     * @param spec
+     * @throws SQLException
+     */
     public void addDoctor(String forename, String surname, String spec) throws SQLException {
         try {
             Statement stmt = connection.createStatement();
@@ -239,6 +305,13 @@ public class DatabaseAccess {
         }
     }
 
+    /**
+     *
+     * @param mealName
+     * @param eaten
+     * @param mealTime
+     * @param patientId
+     */
     public void addMeal(String mealName, boolean eaten, String mealTime, int patientId) {
         try {
             Statement stmt = connection.createStatement();
@@ -249,24 +322,45 @@ public class DatabaseAccess {
         }
     }
 
+    /**
+     *
+     * @param first_name
+     * @param last_name
+     * @param symptoms
+     * @param illness
+     * @param inQueue
+     * @param timeArrived
+     * @param doctor_id
+     * @throws SQLException
+     */
     public void addPatient(String first_name, String last_name, String symptoms, String illness,
-            boolean inQueue, int time_waiting, int doctor_id) throws SQLException {
+            boolean inQueue, String timeArrived, int doctor_id) throws SQLException {
 
         try {
             if (doctor_id != 0) {
                 Statement stmt = connection.createStatement();
-                stmt.executeUpdate("INSERT INTO PATIENT (PATIENT_FORENAME, PATIENT_SURNAME, SYMPTOMS, ILLNESS, IN_QUEUE, TIME_WAITING_MINUTES, DOCTOR_ID) VALUES "
-                        + "('" + first_name + "', '" + last_name + "', '" + symptoms + "', '" + illness + "', '" + inQueue + "', '" + time_waiting + "', '" + doctor_id + "');");
+                stmt.executeUpdate("INSERT INTO PATIENT (PATIENT_FORENAME, PATIENT_SURNAME, SYMPTOMS, ILLNESS, IN_QUEUE, TIME_ARRIVED, DOCTOR_ID) VALUES "
+                        + "('" + first_name + "', '" + last_name + "', '" + symptoms + "', '" + illness + "', '" + inQueue + "', '" + timeArrived + "', '" + doctor_id + "');");
             } else {
                 Statement stmt = connection.createStatement();
-                stmt.executeUpdate("INSERT INTO PATIENT (PATIENT_FORENAME, PATIENT_SURNAME, SYMPTOMS, ILLNESS, IN_QUEUE, TIME_WAITING_MINUTES, DOCTOR_ID) VALUES "
-                        + "('" + first_name + "', '" + last_name + "', '" + symptoms + "', '" + illness + "', '" + inQueue + "', '" + time_waiting + "', '" + null + "');");
+                stmt.executeUpdate("INSERT INTO PATIENT (PATIENT_FORENAME, PATIENT_SURNAME, SYMPTOMS, ILLNESS, IN_QUEUE, TIME_ARRIVED, DOCTOR_ID) VALUES "
+                        + "('" + first_name + "', '" + last_name + "', '" + symptoms + "', '" + illness + "', '" + inQueue + "', '" + timeArrived + "', '" + null + "');");
             }
         } catch (SQLException ex) {
             System.out.println(ex);
         }
     }
 
+    /**
+     *
+     * @param medicationName
+     * @param frequencyPerDay
+     * @param numberOfDays
+     * @param timeToTakeMeds
+     * @param medecineTaken
+     * @param patientId
+     * @throws SQLException
+     */
     public void addPrescripton(String medicationName, int frequencyPerDay, int numberOfDays,
             String timeToTakeMeds, boolean medecineTaken, int patientId) throws SQLException {
         try {
@@ -279,6 +373,11 @@ public class DatabaseAccess {
         }
     }
 
+    /**
+     *
+     * @param wardName
+     * @throws SQLException
+     */
     public void addWard(String wardName) throws SQLException {
         try {
             Statement stmt = connection.createStatement();
@@ -288,24 +387,47 @@ public class DatabaseAccess {
         }
     }
 
+    /**
+     *
+     * @param p
+     * @param newId
+     * @throws SQLException
+     */
     public void updatePatientPresId(Patient p, int newId) throws SQLException {
         String sql = "UPDATE PATIENT SET PRESCRIPTION_ID ='" + newId + "' WHERE ID = '" + p.getId() + "';";
         Statement stmt = connection.createStatement();
         stmt.executeUpdate(sql);
     }
 
+    /**
+     *
+     * @param b
+     * @param newId
+     * @throws SQLException
+     */
     public void updateBedPatientId(Bed b, int newId) throws SQLException {
         String sql = "UPDATE BED SET PATIENT_ID ='" + newId + "' WHERE BED_ID = '" + b.getBed_id() + "';";
         Statement stmt = connection.createStatement();
         stmt.executeUpdate(sql);
     }
 
+    /**
+     *
+     * @param p
+     * @param newId
+     * @throws SQLException
+     */
     public void updatePatientDoctorId(Patient p, int newId) throws SQLException {
         String sql = "UPDATE PATIENT SET DOCTOR_ID='" + newId + "' WHERE ID='" + p.getId() + "';";
         Statement stmt = connection.createStatement();
         stmt.executeUpdate(sql);
     }
 
+    /**
+     *
+     * @param b
+     * @throws SQLException
+     */
     public void updateBed(ArrayList<Bed> b) throws SQLException {
         String sql = "";
         for (int i = 0; i < b.size(); i++) {
@@ -315,6 +437,11 @@ public class DatabaseAccess {
         stmt.executeUpdate(sql);
     }
 
+    /**
+     *
+     * @param d
+     * @throws SQLException
+     */
     public void updateDoctor(ArrayList<Doctor> d) throws SQLException {
         String sql = "";
         for (int i = 0; i < d.size(); i++) {
@@ -325,11 +452,16 @@ public class DatabaseAccess {
         stmt.executeUpdate(sql);
     }
 
+    /**
+     *
+     * @param p
+     * @throws SQLException
+     */
     public void updatePatient(ArrayList<Patient> p) throws SQLException {
         String sql = "";
         for (int i = 0; i < p.size(); i++) {
             sql += "UPDATE PATIENT SET PATIENT_FORENAME='" + p.get(i).getForename() + "', PATIENT_SURNAME='" + p.get(i).getSurname() + "', SYMPTOMS='" + p.get(i).getSymptoms() + "', "
-                    + "ILLNESS='" + p.get(i).getIllness() + "', IN_QUEUE='" + p.get(i).isIn_queue() + "', TIME_WAITING_MINUTES='" + p.get(i).getTime_waiting() + "'"
+                    + "ILLNESS='" + p.get(i).getIllness() + "', IN_QUEUE='" + p.get(i).isIn_queue() + "', TIME_ARRIVED='" + p.get(i).getTimeArrived() + "'"
                     + " WHERE ID='" + p.get(i).getId() + "';\n";
         }
 
@@ -337,6 +469,11 @@ public class DatabaseAccess {
         stmt.executeUpdate(sql);
     }
 
+    /**
+     *
+     * @param m
+     * @throws SQLException
+     */
     public void updateMeal(ArrayList<Meal> m) throws SQLException {
         String sql = "";
         for (int i = 0; i < m.size(); i++) {
@@ -348,6 +485,11 @@ public class DatabaseAccess {
         stmt.executeUpdate(sql);
     }
 
+    /**
+     *
+     * @param p
+     * @throws SQLException
+     */
     public void updatePrescription(ArrayList<Prescription> p) throws SQLException {
         //System.out.println(p.size());
         String sql = "";
@@ -362,6 +504,11 @@ public class DatabaseAccess {
 
     }
 
+    /**
+     *
+     * @param w
+     * @throws SQLException
+     */
     public void updateWard(ArrayList<Ward> w) throws SQLException {
         String sql = "";
         for (Ward ward : w) {
@@ -371,6 +518,10 @@ public class DatabaseAccess {
         stmt.executeUpdate(sql);
     }
 
+    /**
+     *
+     * @param b
+     */
     public void deleteBed(ObservableList<Bed> b) {
         String sql = "";
         for (Bed d : b) {
@@ -384,6 +535,10 @@ public class DatabaseAccess {
         }
     }
 
+    /**
+     *
+     * @param d
+     */
     public void deleteDoctor(ObservableList<Doctor> d) {
         String sql = "";
         for (int i = 0; i < d.size(); i++) {
@@ -398,6 +553,10 @@ public class DatabaseAccess {
         }
     }
 
+    /**
+     *
+     * @param m
+     */
     public void deleteMeal(ObservableList<Meal> m) {
         String sql = "";
         for (int i = 0; i < m.size(); i++) {
@@ -411,9 +570,16 @@ public class DatabaseAccess {
         }
     }
 
+    /**
+     *
+     * @param p
+     */
     public void deletePatient(ObservableList<Patient> p) {
         String sql = "";
         for (int i = 0; i < p.size(); i++) {
+            deletePrescription(p.get(i).getPresc());
+            deleteMeal(p.get(i).getMeals());
+                
             sql += "DELETE FROM PATIENT WHERE ID='" + p.get(i).getId() + "';";
         }
 
@@ -425,6 +591,10 @@ public class DatabaseAccess {
         }
     }
 
+    /**
+     *
+     * @param p
+     */
     public void deletePrescription(ObservableList<Prescription> p) {
         String sql = "";
         for (int i = 0; i < p.size(); i++) {
@@ -439,10 +609,15 @@ public class DatabaseAccess {
         }
     }
 
+    /**
+     *
+     * @param w
+     */
     public void deleteWard(ObservableList<Ward> w) {
         String sql = "";
-        for (Ward ward : w) {
-            sql += "DELETE FROM WARD WHERE WARD_ID='" + ward.getWard_id() + "';";
+        for (int i = 0; i < w.size(); i++) {
+            deleteBed(w.get(i).getBeds());
+            sql += "DELETE FROM WARD WHERE WARD_ID='" + w.get(i).getWard_id() + "';";
         }
 
         try {
@@ -453,6 +628,12 @@ public class DatabaseAccess {
         }
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     * @throws SQLException
+     */
     public ObservableList<Meal> getMealsForPatient(int id) throws SQLException {
         ObservableList<Meal> patMeals = FXCollections.observableArrayList();
         if (connection != null) {
@@ -470,6 +651,12 @@ public class DatabaseAccess {
         return patMeals;
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     * @throws SQLException
+     */
     public ObservableList<Prescription> getPrescriptionsForPatient(int id) throws SQLException {
         ObservableList<Prescription> patPres = FXCollections.observableArrayList();
         if (connection != null) {
@@ -491,6 +678,12 @@ public class DatabaseAccess {
         return patPres;
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     * @throws SQLException
+     */
     public ObservableList<Patient> getPatientsForDoctor(int id) throws SQLException {
         ObservableList<Patient> docPats = FXCollections.observableArrayList();
         if (connection != null) {
@@ -503,14 +696,20 @@ public class DatabaseAccess {
                 String symptoms = result.getString("symptoms");
                 String illness = result.getString("illness");
                 boolean in_queue = result.getBoolean("in_queue");
-                int time_waiting = result.getInt("time_waiting_minutes");
-                Patient patient = new Patient(patid, forename, surname, symptoms, illness, in_queue, time_waiting, getPrescriptionsForPatient(patid), getMealsForPatient(patid));
+                String timeArrived = result.getString("time_arrived");
+                Patient patient = new Patient(patid, forename, surname, symptoms, illness, in_queue, timeArrived, getPrescriptionsForPatient(patid), getMealsForPatient(patid));
                 docPats.add(patient);
             }
         }
         return docPats;
     }
 
+    /**
+     *
+     * @param id
+     * @return
+     * @throws SQLException
+     */
     public ObservableList<Bed> getBedsForWard(int id) throws SQLException {
         Patient patient = null;
         patients = getPatients();
@@ -533,5 +732,29 @@ public class DatabaseAccess {
 
         }
         return wardBeds;
+    }
+    
+    /**
+     *
+     * @param b
+     * @throws SQLException
+     */
+    public void removePatientFromBed(Bed b) throws SQLException {
+        if (connection != null) {
+            Statement stmt = connection.createStatement();
+            stmt.executeUpdate("UPDATE BED SET PATIENT_ID='' WHERE BED_ID="+b.getBed_id());
+        }
+    }
+    
+    /**
+     *
+     * @param d
+     * @throws SQLException
+     */
+    public void removePatientFromDoctor(Doctor d) throws SQLException {
+        if (connection != null) {
+            Statement stmt = connection.createStatement();
+            stmt.executeUpdate("UPDATE DOCTOR SET PATIENT_ID='' WHERE DOCTOR_ID="+d.getDoctor_id());
+        }
     }
 }

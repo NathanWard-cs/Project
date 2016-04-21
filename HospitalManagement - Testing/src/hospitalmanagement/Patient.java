@@ -9,27 +9,27 @@ import javafx.collections.ObservableList;
 
 public class Patient {
     
-    private int id, time_waiting;
-    private String forename, surname, symptoms, illness;
+    private int id;
+    private String forename, surname, symptoms, illness, timeArrived;
     private boolean in_queue;
     private ObservableList<Prescription> presc;
     private ObservableList<Meal> meals;
     
     public Patient(String forename, String surname, String symptoms, 
-            String illness, boolean in_queue, int time_waiting, ObservableList<Prescription> presc,
+            String illness, boolean in_queue, String timeArrived, ObservableList<Prescription> presc,
             ObservableList<Meal> meals) {
         this.forename = forename;
         this.surname = surname;
         this.symptoms = symptoms;
         this.illness = illness;
         this.in_queue = in_queue;
-        this.time_waiting = time_waiting;
+        this.timeArrived = timeArrived;
         this.presc = presc;
         this.meals = meals;
     }
     
     public Patient(int id, String forename, String surname, String symptoms, 
-            String illness, boolean in_queue, int time_waiting, ObservableList<Prescription> presc,
+            String illness, boolean in_queue, String timeArrived, ObservableList<Prescription> presc,
             ObservableList<Meal> meals) {
         this.id = id;
         this.forename = forename;
@@ -37,7 +37,7 @@ public class Patient {
         this.symptoms = symptoms;
         this.illness = illness;
         this.in_queue = in_queue;
-        this.time_waiting = time_waiting;
+        this.timeArrived = timeArrived;
         this.presc = presc;
         this.meals = meals;
     }
@@ -68,12 +68,12 @@ public class Patient {
         this.meals = meals;
     }
 
-    public int getTime_waiting() {
-        return time_waiting;
+    public String getTimeArrived() {
+        return timeArrived;
     }
 
-    public void setTime_waiting(int time_waiting) {
-        this.time_waiting = time_waiting;
+    public void setTimeArrived(String timeArrived) {
+        this.timeArrived = timeArrived;
     }
 
     public String getSymptoms() {
@@ -119,7 +119,7 @@ public class Patient {
     
     
     public String patientToString() {
-        return "Forename: "+forename+", Surname: "+surname+", Symptoms: "+symptoms+", Illness: "+illness+", In Queue: "+in_queue+", Time waiting: "+time_waiting;
+        return "Forename: "+forename+", Surname: "+surname+", Symptoms: "+symptoms+", Illness: "+illness+", In Queue: "+in_queue+", Time waiting: "+timeArrived;
     }
     
 }
