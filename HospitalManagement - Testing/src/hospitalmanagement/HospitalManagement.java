@@ -67,20 +67,28 @@ public class HospitalManagement extends Application {
     public HospitalManagement() throws SQLException {
     }
 
+    /**
+     * This is the first function that is run once the program has started.
+     * @param primaryStage
+     * @throws Exception
+     * @throws SQLException 
+     */
     @Override
     public void start(Stage primaryStage) throws Exception, SQLException {
 
+        //Initialises objects
         rc = new ReportCreator();
         db = new DatabaseAccess();
-        System.out.println("Hello");
+        //Automatically creates reports or adds data to the time list.
         rc.calculateDate();
-        //rc.getAllReports();
+        //Set the title of the window
         this.title = "Hospital Management";
         primaryStage.setTitle(title);
-
-        primaryStage.setScene(loginPage(primaryStage, homePage("Hospital Management", getMenu(primaryStage, getSearchBar()), getSearchBar())));
+        //Displays the login screen first.
+        primaryStage.setScene(loginPage(primaryStage, editPatient("View Patients", getMenu(primaryStage, getSearchBar()), getSearchBar(), primaryStage)));
         primaryStage.show();
 
+        //Stops the timer once the program window has been exited.
         primaryStage.setOnCloseRequest(e -> {
             if (!gregTimes.isEmpty()) {
                 rc.getScheduled().shutdown();
@@ -92,8 +100,8 @@ public class HospitalManagement extends Application {
     }
 
     /**
-     *
-     * @return
+     * This function is used to insert the search bar in all the pages.
+     * @return a search bar.
      */
     public TextField getSearchBar() {
         TextField searchField = new TextField();
@@ -103,16 +111,14 @@ public class HospitalManagement extends Application {
     }
 
     /**
-     *
+     * This creates a menu and all of the links to different pages.
      * @param primaryStage
      * @param searchField
-     * @return
+     * @return a menu
      */
     public MenuBar getMenu(Stage primaryStage, TextField searchField) {
         //Menu
         MenuItem viewPatient = new MenuItem("Patient");
-
-        //MenuItem editPatient = new MenuItem("Patient");
         MenuItem viewPrescription = new MenuItem("Prescription");
         MenuItem viewBed = new MenuItem("Bed");
         MenuItem viewWard = new MenuItem("Ward");
@@ -125,10 +131,9 @@ public class HospitalManagement extends Application {
         MenuItem exit = new MenuItem("Exit");
         exit.setOnAction(e -> primaryStage.close());
 
-        MenuItem home = new MenuItem("Home");
 
         Menu fileMenu = new Menu("File");
-        fileMenu.getItems().addAll(home, exit);
+        fileMenu.getItems().addAll(exit);
 
         Menu viewMenu = new Menu("View");
         viewMenu.getItems().addAll(viewPatient, viewPrescription, viewBed, viewWard, viewDoctor, viewMeal, viewReports);
@@ -139,14 +144,7 @@ public class HospitalManagement extends Application {
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().addAll(fileMenu, viewMenu, designMenu);
 
-        home.setOnAction(e -> {
-            try {
-                primaryStage.setScene(homePage("Hospital Management", menuBar, searchField));
-            } catch (SQLException ex) {
-                System.out.println(ex);
-            }
-        });
-        //Creates the add patient form
+        //Menu actions
         viewPatient.setOnAction(e -> {
             try {
                 primaryStage.setScene(editPatient("Patient", menuBar, searchField, primaryStage));
@@ -215,13 +213,15 @@ public class HospitalManagement extends Application {
      * @param fields
      * @param button
      * @param select
-     * @return
+     * @return A layout of the adding form for each entity (patient, doctor etc).
      */
     public VBox addTemplate(Label[] labels, TextField[] fields, Button button, ComboBox[] select) {
         VBox add = new VBox();
+        //Adds a combo box if it is required.
         if (select != null) {
             add.getChildren().addAll(Arrays.asList(select));
         }
+        //Adds labels and text boxes
         for (int i = 0; i < labels.length; i++) {
             add.getChildren().add(labels[i]);
             add.getChildren().add(fields[i]);
@@ -233,59 +233,9 @@ public class HospitalManagement extends Application {
 
     /**
      *
-     * @param title
-     * @param menuBar
-     * @param search
-     * @return
-     * @throws SQLException
-     */
-    public Scene homePage(String title, MenuBar menuBar, TextField search) throws SQLException {
-        TableColumn<Patient, String> forenameCol = new TableColumn<>("Forename");
-        forenameCol.setCellValueFactory(new PropertyValueFactory<>("forename"));
-        forenameCol.setMinWidth(20);
-
-        TableColumn<Patient, String> surnameCol = new TableColumn<>("Surname");
-        surnameCol.setCellValueFactory(new PropertyValueFactory<>("surname"));
-        surnameCol.setMinWidth(20);
-
-        TableColumn<Patient, String> symptomsCol = new TableColumn<>("Symptoms");
-        symptomsCol.setCellValueFactory(new PropertyValueFactory<>("symptoms"));
-        symptomsCol.setMinWidth(20);
-
-        TableColumn<Patient, String> illnessCol = new TableColumn<>("Illness");
-        illnessCol.setCellValueFactory(new PropertyValueFactory<>("illness"));
-        illnessCol.setMinWidth(20);
-
-        TableColumn<Patient, String> inQueueCol = new TableColumn<>("In Queue");
-        inQueueCol.setCellValueFactory(new PropertyValueFactory<>("in_queue"));
-        inQueueCol.setMinWidth(20);
-
-        TableColumn<Patient, String> doctorForenameCol = new TableColumn<>("Doctors Forename");
-        doctorForenameCol.setCellValueFactory(new PropertyValueFactory<>("doctor_forename"));
-        doctorForenameCol.setMinWidth(20);
-
-        TableView table = new TableView<>();
-        table.setItems(db.getPatients());
-        table.getColumns().addAll(forenameCol, surnameCol, symptomsCol, illnessCol, inQueueCol, doctorForenameCol);
-
-        //Home screen layout
-        BorderPane homeLayout = new BorderPane();
-        GridPane content = new GridPane();
-        homeLayout.setTop(menuBar);
-        homeLayout.setCenter(content);
-
-        GridPane.setConstraints(search, 2, 1);
-        GridPane.setConstraints(table, 0, 5);
-        content.getChildren().addAll(search, table);
-        Scene scene1 = new Scene(homeLayout, 800, 600);
-        return scene1;
-    }
-
-    /**
-     *
      * @param primaryStage
      * @param home
-     * @return
+     * @return the login screen page.
      */
     public Scene loginPage(Stage primaryStage, Scene home) {
         Label userLabel = new Label("Username:");
@@ -295,6 +245,7 @@ public class HospitalManagement extends Application {
 
         Label error = new Label();
 
+        //Checks to see if login details exist otherwise display error text
         Button submit = new Button("Log in");
         submit.setOnAction(e -> {
             try {
@@ -309,6 +260,7 @@ public class HospitalManagement extends Application {
             }
         });
 
+        //Set position of all nodes.
         GridPane layout = new GridPane();
         GridPane.setConstraints(userLabel, 0, 0);
         GridPane.setConstraints(username, 1, 0);
@@ -327,12 +279,13 @@ public class HospitalManagement extends Application {
      * @param menuBar
      * @param search
      * @param primaryStage
-     * @return
+     * @return the edit bed page.
      * @throws SQLException
      */
     public Scene editBed(String title, MenuBar menuBar, TextField search, Stage primaryStage) throws SQLException {
         TableView tb = new TableView<>();
-
+        
+        //Create the table columns and make set functionality for when editing
         TableColumn<Bed, Integer> id = new TableColumn("ID");
         createColumnInteger(id, "bed_id");
         id.setOnEditCommit(e -> ((Bed) e.getTableView().getItems().get(
@@ -343,9 +296,11 @@ public class HospitalManagement extends Application {
         cleaned.setOnEditCommit(e -> ((Bed) e.getTableView().getItems().get(
                 e.getTablePosition().getRow())).setCleaned(e.getNewValue()));
 
+        
         ObservableList<Bed> beds = FXCollections.observableArrayList(db.getBeds());
         FilteredList<Bed> bedsFilt = new FilteredList<>(beds, bed -> true);
 
+        //Sets search bar functionality
         search.textProperty().addListener((observable, oldValue, newValue) -> {
             bedsFilt.setPredicate(bed -> {
                 if (newValue == null || newValue.isEmpty()) {
@@ -363,14 +318,18 @@ public class HospitalManagement extends Application {
             });
         });
 
+        
+        //Set table data to the filtered data
         SortedList<Bed> bedSorted = new SortedList(bedsFilt);
         bedSorted.comparatorProperty().bind(tb.comparatorProperty());
 
+        //Set the table data to the normal data so functionality can be performed on it.
         tb.setItems(beds);
 
         tb.setEditable(true);
         tb.getColumns().addAll(id, cleaned);
 
+        //Adds functionality for viewing a beds data.
         Button viewButton = new Button("View Data");
         viewButton.setOnAction(e -> {
             try {
@@ -379,7 +338,8 @@ public class HospitalManagement extends Application {
                 System.out.println(ex);
             }
         });
-
+        
+        //Adds functionality for updating data in table.
         Button editButton = new Button("Save");
         editButton.setOnAction(f -> {
             ArrayList<Bed> b = new ArrayList<>();
@@ -393,6 +353,7 @@ public class HospitalManagement extends Application {
             }
         });
 
+        //Functionality for deleting bed
         Button deleteButton = new Button("Delete");
         deleteButton.setOnAction(e -> deleteBed(tb));
 
@@ -404,6 +365,7 @@ public class HospitalManagement extends Application {
         innerPane.requestFocus();
         outerPane.setCenter(innerPane);
 
+        //Data to be sent to add template
         Label[] labels = new Label[]{new Label("Cleaned")};
         TextField[] fields = new TextField[labels.length];
         for (int i = 0; i < fields.length; i++) {
@@ -420,6 +382,7 @@ public class HospitalManagement extends Application {
         combo.setPromptText("Select Ward:");
         ComboBox[] select = new ComboBox[]{combo};
 
+        //Setting add template button functionality
         Button button = new Button("Submit");
         button.setOnAction(e -> {
             try {
@@ -441,7 +404,7 @@ public class HospitalManagement extends Application {
      * @param menuBar
      * @param search
      * @param primaryStage
-     * @return
+     * @return the edit doctor page.
      * @throws SQLException
      */
     public Scene editDoctor(String title, MenuBar menuBar, TextField search, Stage primaryStage) throws SQLException {
@@ -565,7 +528,7 @@ public class HospitalManagement extends Application {
      * @param menuBar
      * @param search
      * @param primaryStage
-     * @return
+     * @return the edit meal page.
      * @throws SQLException
      */
     public Scene editMeal(String title, MenuBar menuBar, TextField search, Stage primaryStage) throws SQLException {
@@ -691,7 +654,7 @@ public class HospitalManagement extends Application {
      * @param menuBar
      * @param search
      * @param primaryStage
-     * @return
+     * @return the edit patient page
      * @throws SQLException
      */
     public Scene editPatient(String title, MenuBar menuBar, TextField search, Stage primaryStage) throws SQLException {
@@ -865,7 +828,7 @@ public class HospitalManagement extends Application {
      * @param menuBar
      * @param search
      * @param primaryStage
-     * @return
+     * @return the edit prescription page
      * @throws SQLException
      */
     public Scene editPrescription(String title, MenuBar menuBar, TextField search, Stage primaryStage) throws SQLException {
@@ -1011,7 +974,7 @@ public class HospitalManagement extends Application {
      * @param menuBar
      * @param search
      * @param primaryStage
-     * @return
+     * @return the edit ward page
      * @throws SQLException
      */
     public Scene editWard(String title, MenuBar menuBar, TextField search, Stage primaryStage) throws SQLException {
@@ -1122,11 +1085,12 @@ public class HospitalManagement extends Application {
      * @param data
      * @param ob
      * @param s
-     * @return
+     * @return the page for viewing data about objects e.g. patients, doctors etc.
      * @throws SQLException
      */
     public Scene viewPage(Stage primaryStage, ArrayList<Label> labels, ArrayList<Label> data, Object ob, String s) throws SQLException {
         Button backButton = new Button("Back to " + s);
+        //Sets the back button when viewing object for the selected object
         backButton.setOnAction(e -> {
             try {
                 if (ob instanceof Patient) {
@@ -1153,6 +1117,7 @@ public class HospitalManagement extends Application {
             layout.add(labels.get(i), 0, (i + 1));
             layout.add(data.get(i), 1, (i + 1));
         }
+        //Adds specific functionality to the view bed page.
         if (ob instanceof Bed) {
             ComboBox pats = new ComboBox();
             Button addPatient = new Button("Add Patient");
@@ -1171,6 +1136,7 @@ public class HospitalManagement extends Application {
                 }
             }
             pats.getItems().addAll(patStrings);
+            //Functionality for removing patient from a bed.
             Button removePatient = new Button("Remove Patient");
             removePatient.setOnAction(e -> {
                 try {
@@ -1183,6 +1149,7 @@ public class HospitalManagement extends Application {
             layout.add(pats, 0, labels.size()+1);
             layout.add(removePatient, 0, labels.size()+2);
         } else if (ob instanceof Patient) {
+            //Functionality for removing a doctor from a patient.
             Button removeDoctor = new Button("Remove Doctor");
             removeDoctor.setOnAction(e -> {
                 try {
@@ -1210,7 +1177,7 @@ public class HospitalManagement extends Application {
      *
      * @param tb
      * @param primaryStage
-     * @return
+     * @return the data that will be included on the view page function.
      * @throws SQLException
      */
     public Scene viewData(TableView tb, Stage primaryStage) throws SQLException {
@@ -1219,6 +1186,7 @@ public class HospitalManagement extends Application {
         Object selected;
         selected = tb.getSelectionModel().getSelectedItem();
         if (selected instanceof Patient) {
+            //Sets the layout for the view patient page
             Patient patient = (Patient) selected;
 
             Label patTitle = new Label("Patient:");
@@ -1266,6 +1234,7 @@ public class HospitalManagement extends Application {
 
             }
             return viewPage(primaryStage, labelList, data, patient, "Students");
+        //Sets the layout for the view prescription page    
         } else if (selected instanceof Prescription) {
             Prescription p =(Prescription) selected;
             data.add(new Label(""));
@@ -1276,6 +1245,7 @@ public class HospitalManagement extends Application {
             labelList.addAll(getPrescriptionIdent());
 
             return viewPage(primaryStage, labelList, data, p, "Prescriptions");
+        //Sets the layout for the view bed page
         } else if (selected instanceof Bed) {
             Bed b = (Bed) selected;
             data = getBedLabels((Bed) selected);
@@ -1297,6 +1267,7 @@ public class HospitalManagement extends Application {
                 data.add(new Label());
             }
             return viewPage(primaryStage, labelList, data, b, "Beds");
+        //Sets the layout for the view meal page.
         } else if (selected instanceof Meal) {
             Meal m = (Meal) selected;
             Label meal = new Label("Meal:");
@@ -1306,6 +1277,7 @@ public class HospitalManagement extends Application {
             labelList.add(meal);
             labelList.addAll(getMealIdent());
             return viewPage(primaryStage, labelList, data, m, "Meals");
+        //Sets the layout for the view doctor page
         } else if (selected instanceof Doctor) {
             Doctor d = (Doctor) selected;
             data.add(new Label(""));
@@ -1327,6 +1299,7 @@ public class HospitalManagement extends Application {
             }
             return viewPage(primaryStage, labelList, data, d, "Doctors");
         } else {
+            //Sets the layout for the view ward page
             Ward w = (Ward) selected;
             Label ward = new Label("Ward");
             ward.setStyle("-fx-underline: true");
@@ -1354,7 +1327,7 @@ public class HospitalManagement extends Application {
      * @param title
      * @param menu
      * @param primaryStage
-     * @return
+     * @return a page showing the reports created, in a list
      * @throws IOException
      */
     public Scene viewFiles(String title, MenuBar menu, Stage primaryStage) throws IOException {
@@ -1365,10 +1338,12 @@ public class HospitalManagement extends Application {
         
         final Label data = new Label();
         
+        //Finds chosen report in the 'reports' folder
         view.setOnAction(e -> {
             String selectedFile = String.valueOf(listOfFiles.getSelectionModel().getSelectedItem());
             Path p = Paths.get("src/reports/"+selectedFile);
             List<String> dataFromFile = null;
+            //Reads all text from the file and puts it together.
             try {
                 dataFromFile = Files.readAllLines(p);
             } catch (IOException ex) {
@@ -1381,6 +1356,7 @@ public class HospitalManagement extends Application {
             data.setText(allData);
         });
         
+        //Finds the chosen file and removes it from the reports folder
         Button remove = new Button("Remove Selected");
         remove.setOnAction(e -> {
             String selectedFile = String.valueOf(listOfFiles.getSelectionModel().getSelectedItem());
@@ -1411,7 +1387,7 @@ public class HospitalManagement extends Application {
 
     /**
      *
-     * @return
+     * @return the list of bed labels
      */
     public ArrayList<Label> getBedIdent() {
         ArrayList<Label> data = new ArrayList<>();
@@ -1422,7 +1398,7 @@ public class HospitalManagement extends Application {
 
     /**
      *
-     * @return
+     * @return the list of doctor labels
      */
     public ArrayList<Label> getDoctorIdent() {
         ArrayList<Label> data = new ArrayList<>();
@@ -1434,7 +1410,7 @@ public class HospitalManagement extends Application {
 
     /**
      *
-     * @return
+     * @return the list of patient labels
      */
     public ArrayList<Label> getPatientIdent() {
         ArrayList<Label> data = new ArrayList<>();
@@ -1449,7 +1425,7 @@ public class HospitalManagement extends Application {
 
     /**
      *
-     * @return
+     * @return the list of prescription labels
      */
     public ArrayList<Label> getPrescriptionIdent() {
         ArrayList<Label> data = new ArrayList<>();
@@ -1463,7 +1439,7 @@ public class HospitalManagement extends Application {
 
     /**
      *
-     * @return
+     * @return the list of meal labels
      */
     public ArrayList<Label> getMealIdent() {
         ArrayList<Label> data = new ArrayList<>();
@@ -1475,7 +1451,7 @@ public class HospitalManagement extends Application {
 
     /**
      *
-     * @return
+     * @return the list of ward labels
      */
     public ArrayList<Label> getWardIdent() {
         ArrayList<Label> data = new ArrayList<>();
@@ -1486,7 +1462,7 @@ public class HospitalManagement extends Application {
     /**
      *
      * @param selected
-     * @return
+     * @return the list of patient data
      */
     public ArrayList<Label> getPatientLabels(Patient selected) {
         ArrayList<Label> data = new ArrayList<>();
@@ -1502,7 +1478,7 @@ public class HospitalManagement extends Application {
     /**
      *
      * @param selected
-     * @return
+     * @return the list of prescription data
      */
     public ArrayList<Label> getPrescriptionLabels(Prescription selected) {
         ArrayList<Label> data = new ArrayList<>();
@@ -1517,7 +1493,7 @@ public class HospitalManagement extends Application {
     /**
      *
      * @param selected
-     * @return
+     * @return the list of bed data
      */
     public ArrayList<Label> getBedLabels(Bed selected) {
         ArrayList<Label> data = new ArrayList<>();
@@ -1529,7 +1505,7 @@ public class HospitalManagement extends Application {
     /**
      *
      * @param selected
-     * @return
+     * @return the list of meal data
      */
     public ArrayList<Label> getMealLabels(Meal selected) {
         ArrayList<Label> data = new ArrayList<>();
@@ -1542,7 +1518,7 @@ public class HospitalManagement extends Application {
     /**
      *
      * @param selected
-     * @return
+     * @return the list of doctor data
      */
     public ArrayList<Label> getDoctorLabels(Doctor selected) {
         ArrayList<Label> data = new ArrayList<>();
@@ -1555,7 +1531,7 @@ public class HospitalManagement extends Application {
     /**
      *
      * @param selected
-     * @return
+     * @return the list of ward labels
      */
     public ArrayList<Label> getWardLabels(Ward selected) {
         ArrayList<Label> data = new ArrayList<>();
@@ -1566,7 +1542,7 @@ public class HospitalManagement extends Application {
     /**
      *
      * @param value
-     * @return
+     * @return the conversion of a string to boolean
      */
     public boolean validateBoolean(String value) {
         return ("Yes".equals(value));
@@ -1575,7 +1551,7 @@ public class HospitalManagement extends Application {
     /**
      *
      * @param input
-     * @return
+     * @return whether the input is valid ('Yes' or 'No').
      */
     public boolean validateCorrectInputs(String input) {
         return input.equals("Yes") || input.equals("No");
@@ -1584,7 +1560,7 @@ public class HospitalManagement extends Application {
     /**
      *
      * @param time
-     * @return
+     * @return whether the input matches the specified regular expression.
      */
     public boolean validateTimeInputs(String time) {
         return time.matches("([01]?[0-9]|2[0-3]):[0-5][0-9]");
@@ -1593,14 +1569,14 @@ public class HospitalManagement extends Application {
     /**
      *
      * @param number
-     * @return
+     * @return whether the input matches the specified regular expression.
      */
     public boolean validateIntegerInputs(String number) {
         return number.matches("[0-4][0-9]|[0-9]");
     }
 
     /**
-     *
+     * This function takes the data from inserting a bed and adds it to the database and table.
      * @param tb
      * @param txtFields
      * @param combo
@@ -1608,6 +1584,7 @@ public class HospitalManagement extends Application {
      */
     public void addBedToTable(TableView tb, TextField[] txtFields, ComboBox[] combo) throws SQLException {
         boolean cleaned = false;
+        //Validates inputs from adding a bed
         if (validateCorrectInputs(txtFields[0].getText())) {
             cleaned = validateBoolean(txtFields[0].getText());
             ObservableList<Ward> wards = db.getWard();
@@ -1631,7 +1608,7 @@ public class HospitalManagement extends Application {
     }
 
     /**
-     *
+     * This function takes the data from adding a doctor and adds it to the database and the table.
      * @param tb
      * @param txtFields
      * @param combo
@@ -1640,18 +1617,16 @@ public class HospitalManagement extends Application {
     public void addDoctorToTable(TableView tb, TextField[] txtFields, ComboBox[] combo) throws SQLException {
         int newid = tb.getItems().size() + 1;
         Doctor d = new Doctor(newid, txtFields[0].getText(), txtFields[1].getText(), txtFields[2].getText(), null);
-        //System.out.println("Hello");
         tb.setItems(db.getDoctors());
         tb.getItems().add(d);
-        //System.out.println("From the other side");
         db.addDoctor(txtFields[0].getText(), txtFields[1].getText(), txtFields[2].getText());
-        for (int i = 0; i < txtFields.length; i++) {
-            txtFields[i].setText("");
+        for (TextField txtField : txtFields) {
+            txtField.setText("");
         }
     }
 
     /**
-     *
+     * This function adds a meal to the database and the table
      * @param tb
      * @param txtFields
      * @param combo
@@ -1659,6 +1634,7 @@ public class HospitalManagement extends Application {
      */
     public void addMealToTable(TableView tb, TextField[] txtFields, ComboBox[] combo) throws SQLException {
         boolean eaten = false;
+        //Validates inputs from add meal
         if (validateCorrectInputs(txtFields[1].getText())) {
             eaten = validateBoolean(txtFields[1].getText());
             String time = null;
@@ -1686,7 +1662,7 @@ public class HospitalManagement extends Application {
     }
 
     /**
-     *
+     * This function adds a patient to the table and database
      * @param tb
      * @param txtFields
      * @param combo
@@ -1694,6 +1670,7 @@ public class HospitalManagement extends Application {
      */
     public void addPatientToTable(TableView tb, TextField[] txtFields, ComboBox[] combo) throws SQLException {
         boolean inqueue = false;
+        //Validates inputs from add patient
         if (validateCorrectInputs(txtFields[4].getText())) {
             inqueue = validateBoolean(txtFields[4].getText());
             if (validateTimeInputs(txtFields[5].getText())) {
@@ -1727,13 +1704,14 @@ public class HospitalManagement extends Application {
     }
 
     /**
-     *
+     * This function adds a prescription to the table and database
      * @param tb
      * @param txtFields
      * @param combo
      * @throws SQLException
      */
     public void addPrescToTable(TableView tb, TextField[] txtFields, ComboBox[] combo) throws SQLException {
+        //Validates inputs from add prescription
         if (validateIntegerInputs(txtFields[1].getText())) {
             if (validateIntegerInputs(txtFields[2].getText())) {
                 if (validateTimeInputs(txtFields[3].getText())) {
@@ -1771,7 +1749,7 @@ public class HospitalManagement extends Application {
     }
 
     /**
-     *
+     * This function adds a ward to a table and database.
      * @param tb
      * @param txtFields
      * @param combo
@@ -1787,7 +1765,7 @@ public class HospitalManagement extends Application {
     }
 
     /**
-     *
+     * This function sets the data type of a table column as integer and sets the data. 
      * @param tc
      * @param source
      */
@@ -1797,7 +1775,7 @@ public class HospitalManagement extends Application {
     }
 
     /**
-     *
+     * This function sets the data type of a table column as string and sets the data.
      * @param tc
      * @param source
      */
@@ -1807,7 +1785,7 @@ public class HospitalManagement extends Application {
     }
 
     /**
-     *
+     * This function sets the data type of a table column as boolean and sets the data.
      * @param tc
      * @param source
      */
@@ -1817,24 +1795,7 @@ public class HospitalManagement extends Application {
     }
 
     /**
-     *
-     * @param tc
-     * @throws SQLException
-     */
-    public void createColumnDoctor(TableColumn tc) throws SQLException {
-        ObservableList<Doctor> doctors = db.getDoctors();
-        ObservableList<String> doctorStrings = FXCollections.observableArrayList();
-        for (Doctor doctor : doctors) {
-            doctorStrings.add(doctor.getDoctor_forename());
-        }
-        //ComboBox list = new ComboBox(doctorStrings);
-        tc.setCellValueFactory(new PropertyValueFactory<>("doctor_forename"));
-        tc.setCellFactory(ComboBoxTableCell.<Doctor, String>forTableColumn(doctorStrings));
-
-    }
-
-    /**
-     *
+     * This function removes a bed from the table and the database.
      * @param tb
      */
     public void deleteBed(TableView tb) {
@@ -1846,7 +1807,7 @@ public class HospitalManagement extends Application {
     }
 
     /**
-     *
+     * This function removes a doctor from the table and the database.
      * @param tb
      */
     public void deleteDoctor(TableView tb) {
@@ -1858,7 +1819,7 @@ public class HospitalManagement extends Application {
     }
 
     /**
-     *
+     * This function removes a meal from the table and the database.
      * @param tb
      */
     public void deleteMeal(TableView tb) {
@@ -1870,7 +1831,7 @@ public class HospitalManagement extends Application {
     }
 
     /**
-     *
+     * This function removes a patient from the table and the database.
      * @param tb
      */
     public void deletePatient(TableView tb) {
@@ -1882,7 +1843,7 @@ public class HospitalManagement extends Application {
     }
 
     /**
-     *
+     * This function removes a prescription from the table and the database.
      * @param tb
      */
     public void deletePrescription(TableView tb) {
@@ -1894,7 +1855,7 @@ public class HospitalManagement extends Application {
     }
 
     /**
-     *
+     * This function removes a ward from the table and the database.
      * @param tb
      */
     public void deleteWard(TableView tb) {
@@ -1907,7 +1868,7 @@ public class HospitalManagement extends Application {
     
     /**
      *
-     * @return
+     * @return the list of times
      */
     public ArrayList<Long> getGregTimes() {
         return gregTimes;

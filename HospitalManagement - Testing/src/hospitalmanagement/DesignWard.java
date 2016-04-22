@@ -20,10 +20,11 @@ public class DesignWard {
     public DesignWard() {}
     
     /**
-     *
-     * @return
+     * If implemented correctly, would allow dragging and dropping
+     * @return the drag and drop page
      */
     public Scene createToolbar() {
+        //Loads image from file and puts it in a toolbar
         ToolBar tb = new ToolBar();
         tb.setOrientation(Orientation.VERTICAL);
         Image img = new Image("res/bed.jpg", 100, 100, false, false);

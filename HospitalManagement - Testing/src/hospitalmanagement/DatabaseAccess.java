@@ -24,7 +24,7 @@ public class DatabaseAccess {
     private ObservableList<Meal> meals;
 
     /**
-     *
+     * Connects to the SQLite database
      * @throws SQLException
      * @throws ClassNotFoundException
      */
@@ -39,7 +39,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Breaks the database connection
      * @throws SQLException
      */
     public void shutdown() throws SQLException {
@@ -52,7 +52,7 @@ public class DatabaseAccess {
      *
      * @param username
      * @param password
-     * @return
+     * @return whether the login details exist
      * @throws SQLException
      */
     public boolean login(String username, String password) throws SQLException {
@@ -72,7 +72,7 @@ public class DatabaseAccess {
 
     /**
      *
-     * @return
+     * @return a list of beds from the database
      * @throws SQLException
      */
     public ObservableList<Bed> getBeds() throws SQLException {
@@ -105,7 +105,7 @@ public class DatabaseAccess {
 
     /**
      *
-     * @return
+     * @return the list of meals from the database
      * @throws SQLException
      */
     public ObservableList<Meal> getMeals() throws SQLException {
@@ -134,7 +134,7 @@ public class DatabaseAccess {
 
     /**
      *
-     * @return
+     * @return the list of patients from the database
      * @throws SQLException
      */
     public ObservableList<Patient> getPatients() throws SQLException {
@@ -172,7 +172,7 @@ public class DatabaseAccess {
 
     /**
      *
-     * @return
+     * @return the list of doctors from the database
      * @throws SQLException
      */
     public ObservableList<Doctor> getDoctors() throws SQLException {
@@ -202,7 +202,7 @@ public class DatabaseAccess {
 
     /**
      *
-     * @return
+     * @return the list of prescriptions from the database
      * @throws SQLException
      */
     public ObservableList<Prescription> getPrescription() throws SQLException {
@@ -234,7 +234,7 @@ public class DatabaseAccess {
 
     /**
      *
-     * @return
+     * @return the list of wards from the database
      * @throws SQLException
      */
     public ObservableList<Ward> getWard() throws SQLException {
@@ -260,7 +260,7 @@ public class DatabaseAccess {
     
     /**
      *
-     * @return
+     * @return any unoccupied beds from the database
      * @throws SQLException
      */
     public ObservableList<Bed> getUnoccupiedBeds() throws SQLException {
@@ -275,7 +275,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Inserts a bed into the database
      * @param cleaned
      * @param ward_id
      */
@@ -289,7 +289,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Inserts a doctor into the database
      * @param forename
      * @param surname
      * @param spec
@@ -306,7 +306,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Inserts a meal into the database
      * @param mealName
      * @param eaten
      * @param mealTime
@@ -323,7 +323,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Inserts a patient into the database
      * @param first_name
      * @param last_name
      * @param symptoms
@@ -352,7 +352,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Inserts a prescription into the database
      * @param medicationName
      * @param frequencyPerDay
      * @param numberOfDays
@@ -374,7 +374,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Inserts a ward into the database
      * @param wardName
      * @throws SQLException
      */
@@ -388,19 +388,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
-     * @param p
-     * @param newId
-     * @throws SQLException
-     */
-    public void updatePatientPresId(Patient p, int newId) throws SQLException {
-        String sql = "UPDATE PATIENT SET PRESCRIPTION_ID ='" + newId + "' WHERE ID = '" + p.getId() + "';";
-        Statement stmt = connection.createStatement();
-        stmt.executeUpdate(sql);
-    }
-
-    /**
-     *
+     * Updates bed when inserting patient to bed
      * @param b
      * @param newId
      * @throws SQLException
@@ -411,20 +399,10 @@ public class DatabaseAccess {
         stmt.executeUpdate(sql);
     }
 
-    /**
-     *
-     * @param p
-     * @param newId
-     * @throws SQLException
-     */
-    public void updatePatientDoctorId(Patient p, int newId) throws SQLException {
-        String sql = "UPDATE PATIENT SET DOCTOR_ID='" + newId + "' WHERE ID='" + p.getId() + "';";
-        Statement stmt = connection.createStatement();
-        stmt.executeUpdate(sql);
-    }
+    
 
     /**
-     *
+     * Updates bed in database
      * @param b
      * @throws SQLException
      */
@@ -438,7 +416,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Updates doctor in database
      * @param d
      * @throws SQLException
      */
@@ -453,7 +431,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Updates patient in database
      * @param p
      * @throws SQLException
      */
@@ -470,7 +448,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Updates meal in database 
      * @param m
      * @throws SQLException
      */
@@ -486,7 +464,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Updates prescription in database
      * @param p
      * @throws SQLException
      */
@@ -505,7 +483,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Update ward in database
      * @param w
      * @throws SQLException
      */
@@ -519,7 +497,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Removes bed from database
      * @param b
      */
     public void deleteBed(ObservableList<Bed> b) {
@@ -536,7 +514,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Removes doctor from database
      * @param d
      */
     public void deleteDoctor(ObservableList<Doctor> d) {
@@ -554,7 +532,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Removes meal from database
      * @param m
      */
     public void deleteMeal(ObservableList<Meal> m) {
@@ -571,7 +549,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Removes patient from database
      * @param p
      */
     public void deletePatient(ObservableList<Patient> p) {
@@ -592,7 +570,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Removes prescription from database
      * @param p
      */
     public void deletePrescription(ObservableList<Prescription> p) {
@@ -610,7 +588,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Removes ward from database
      * @param w
      */
     public void deleteWard(ObservableList<Ward> w) {
@@ -629,7 +607,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Gets a specified patients meals
      * @param id
      * @return
      * @throws SQLException
@@ -652,7 +630,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Gets a specified patients prescriptions
      * @param id
      * @return
      * @throws SQLException
@@ -679,7 +657,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Gets a specified doctors patients
      * @param id
      * @return
      * @throws SQLException
@@ -705,7 +683,7 @@ public class DatabaseAccess {
     }
 
     /**
-     *
+     * Gets a specified wards beds
      * @param id
      * @return
      * @throws SQLException
@@ -735,7 +713,7 @@ public class DatabaseAccess {
     }
     
     /**
-     *
+     * Removes a patient from a bed
      * @param b
      * @throws SQLException
      */
@@ -747,7 +725,7 @@ public class DatabaseAccess {
     }
     
     /**
-     *
+     * Removes a patient from a doctor
      * @param d
      * @throws SQLException
      */

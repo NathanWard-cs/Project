@@ -35,7 +35,7 @@ public class ReportCreator {
     private HospitalManagement hm;
     
     /**
-     *
+     * Initialises objects
      * @throws SQLException
      * @throws ClassNotFoundException
      */
@@ -45,9 +45,9 @@ public class ReportCreator {
     }
     
     /**
-     *
+     * Turns a time string into a Gregorian calendar
      * @param date
-     * @return
+     * @return Gregorian calendar representation of a time
      */
     public GregorianCalendar stringToGreg(String date) {
         String[] hoursAndMins = date.split(":");
@@ -65,7 +65,7 @@ public class ReportCreator {
     /**
      *
      * @param date
-     * @return
+     * @return Gregorian time in milliseconds
      */
     public long stringToDate(String date) {
         long timeMillis = stringToGreg(date).getTime().getTime();
@@ -74,7 +74,7 @@ public class ReportCreator {
 
     /**
      *
-     * @return
+     * @return current time in Gregorian calendar format
      */
     public GregorianCalendar currentDateGreg() {
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
@@ -89,7 +89,7 @@ public class ReportCreator {
 
     /**
      *
-     * @return
+     * @return current date in milliseconds
      */
     public long getCurrentDate() {
         long currentMillis = currentDateGreg().getTime().getTime();
@@ -97,7 +97,8 @@ public class ReportCreator {
     }
 
     /**
-     *
+     * Loads all data that has time constraints, if time data is later than the current time a report will be created, 
+     * otherwise it will be put into a list.
      * @throws ParseException
      * @throws SQLException
      * @throws IOException
@@ -109,7 +110,6 @@ public class ReportCreator {
             if (p.isIn_queue()) {
                 difference = stringToDate(p.getTimeArrived()) - getCurrentDate();
                 if (difference < 0) {
-                    System.out.println("1");
                     writeReport(p, null);
                 } else {
                     hm.getGregTimes().add(difference);
@@ -119,7 +119,6 @@ public class ReportCreator {
                 if (pre.isMedicine_taken() == false) {
                     difference = stringToDate(pre.getTime_to_take_medicine()) - getCurrentDate();
                     if (difference < 0) {
-                        System.out.println("2");
                         writeReport(p, pre);
                     } else {
                         hm.getGregTimes().add(difference);
@@ -129,7 +128,6 @@ public class ReportCreator {
             for (Meal m : p.getMeals()) {
                 difference = stringToDate(m.getMeal_time()) - getCurrentDate();
                 if (difference < 0) {
-                    System.out.println("3");
                     writeReport(p, m);
                 } else {
                     hm.getGregTimes().add(difference);
@@ -141,12 +139,11 @@ public class ReportCreator {
             Collections.sort(hm.getGregTimes());
             timer();
         }
-        //Implement it so that each element of the list is the value take away the
-        //previous value.
+        
     }
 
     /**
-     *
+     * 
      * @throws IOException
      * @throws SQLException
      */
@@ -182,7 +179,7 @@ public class ReportCreator {
     }
 
     /**
-     *
+     * Writes a report in a text file, contents is based on which object missed their time constraint.
      * @param pat
      * @param ob2
      * @throws IOException
@@ -214,7 +211,7 @@ public class ReportCreator {
     
     /**
      *
-     * @return
+     * @return all reports in the reports folder as strings
      */
     public ObservableList<String> getAllReports() {
         ObservableList fileStrings = FXCollections.observableArrayList();
@@ -229,7 +226,7 @@ public class ReportCreator {
     /**
      *
      * @param gc
-     * @return
+     * @return Gregorian time as string
      */
     public String gregorianToString(GregorianCalendar gc) {
         SimpleDateFormat sd = new SimpleDateFormat("HH-mm, dd-MM-YYYY");
@@ -239,7 +236,7 @@ public class ReportCreator {
     }
 
     /**
-     *
+     * Changes the interval of the timer every time a time from the list is met. 
      */
     public void changeInterval() {
         if (hm.getGregTimes().size() > 1) {
@@ -251,7 +248,7 @@ public class ReportCreator {
     }
 
     /**
-     *
+     * Begins the timer, starts running on program start-up
      */
     public void timer() {
         runner = () -> {
@@ -271,7 +268,7 @@ public class ReportCreator {
     
     /**
      *
-     * @return
+     * @return time scheduler
      */
     public ScheduledExecutorService getScheduled() {
         return s;
